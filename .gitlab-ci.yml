@@ -13,19 +13,17 @@ build:
   stage: build
   script:
     - docker build -t my-react-app:latest .
-    - docker tag my-react-app:latest registry.gitlab.com/your-namespace/my-react-app:latest
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
-    - docker push registry.gitlab.com/your-namespace/my-react-app:latest
+    - docker save -o my-react-app.tar my-react-app:latest
+    - scp my-react-app.tar $SERVER_USER@$SERVER_HOST:/path/to/destination
 
 deploy:
   stage: deploy
   script:
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
-      docker pull registry.gitlab.com/your-namespace/my-react-app:latest
+      docker load -i /path/to/destination/my-react-app.tar
       docker stop my-react-app || true
       docker rm my-react-app || true
-      docker run -d --name my-react-app -p 80:80 registry.gitlab.com/your-namespace/my-react-app:latest
+      docker run -d --name my-react-app -p 80:80 my-react-app:latest
     "
   only:
     - main
