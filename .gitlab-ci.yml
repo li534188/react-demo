@@ -23,7 +23,6 @@ deploy:
       docker load -i /path/to/destination/my-react-app.tar
       docker stop my-react-app || true
       docker rm my-react-app || true
-      docker run -d --name my-react-app -p 80:80 my-react-app:latest
-    "
+      docker run -d --name my-react-app -p 80:80 my-react-app:latest"
   only:
     - main
